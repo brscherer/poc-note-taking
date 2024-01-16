@@ -5,7 +5,7 @@ const NoteList = ({ notes, setSelectedNote, deleteNote }) => {
         Add Note
       </button>
       <ul>
-        {notes.map((note, index) => note && (
+        {notes?.map((note, index) => note && (
           <li key={index}>
             <div>
               <span onClick={() => setSelectedNote(note)}>
