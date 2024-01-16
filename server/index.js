@@ -1,55 +1,33 @@
-const express = require('express');
-const cors = require('cors');
+import express, { json } from 'express';
+import cors from 'cors';
+import NotesService from './src/NoteService.js';
 
 const app = express();
 const port = 3000;
 
 app.use(cors());
-app.use(express.json());
+app.use(json());
 
-const mockNote = {
-  id: 99,
-  title: `1234567890...`,
-  content: `1234567890 qweqwe asdasd qwe qwe asd asd qweqweasdasdqwe qwe  asdasd \n\n\n\ weqwe qweqwe qweqwe`,
-  lastUpdated: Date.now()
-}
-
-let notes = [mockNote]
-let id = 1
+const notesService = new NotesService()
 
 app.get('/notes', (req, res) => {
-  res.json({ notes });
+  res.json(notesService.getAllNotes());
 })
 
 app.post('/notes', (req, res) => {
   const { note } = req.body
-  const noteObj = {
-    id,
-    title: note.length > 10 ? `${note.slice(0, 10)}...` : note,
-    content: note,
-    lastUpdated: Date.now()
-  }
-  notes.push(noteObj)
-  id++
-  res.json({ notes, newNote: noteObj });
+  res.json(notesService.addNote(note));
 })
 
 app.put('/notes/:id', (req, res) => {
   const { note } = req.body
-
-  const updatedNote = {
-    id: Number(req.params.id),
-    title: note?.length > 10 ? `${note.slice(0, 10)}...` : note,
-    content: note,
-    lastUpdated: Date.now()
-  }
-  notes = notes.map(n => Number(n.id) === Number(req.params.id) ? updatedNote : n)
-  res.json({ notes, newNote: updatedNote });
+  const { id } = req.params;
+  res.json(notesService.updateNote(Number(id), note));
 })
 
 app.delete('/notes/:id', (req, res) => {
-  notes = notes.filter(n => Number(n.id) !== Number(req.params.id))
-  res.json({ notes });
+  const { id } = req.params;
+  res.json(notesService.deleteNote(Number(id)));
 })
 
 app.listen(port, () => {
